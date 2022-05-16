@@ -17,6 +17,7 @@
 # limitations under the License.
 
 from . import (
+    yolo_v3,
     albert,
     auto,
     bart,

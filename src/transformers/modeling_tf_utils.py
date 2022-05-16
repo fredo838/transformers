@@ -59,7 +59,6 @@ from .utils import (
     logging,
 )
 
-
 logger = logging.get_logger(__name__)
 tf_logger = tf.get_logger()
 
@@ -152,7 +151,6 @@ def keras_serializable(cls):
     if not hasattr(cls, "get_config"):
         raise TypeError("Only use @keras_serializable on tf.keras.layers.Layer subclasses")
     if hasattr(cls.get_config, "_is_default"):
-
         def get_config(self):
             cfg = super(cls, self).get_config()
             cfg["config"] = self._config.to_dict()
@@ -366,10 +364,8 @@ def unpack_inputs(func):
         kwargs_call = {key: val for key, val in kwargs.items() if key not in dict(original_signature.parameters)}
         fn_args_and_kwargs = {key: val for key, val in kwargs.items() if key not in kwargs_call}
         fn_args_and_kwargs.update({"kwargs_call": kwargs_call})
-
         # move any arg into kwargs, if they exist
         fn_args_and_kwargs.update(dict(zip(func.__code__.co_varnames[1:], args)))
-
         # process the inputs and call the wrapped function
         main_input_name = getattr(self, "main_input_name", func.__code__.co_varnames[1])
         main_input = fn_args_and_kwargs.pop(main_input_name, None)
@@ -406,7 +402,7 @@ def input_processing(func, config, input_ids, **kwargs):
     signature.pop("self", None)
     parameter_names = list(signature.keys())
     output = {}
-    allowed_types = (tf.Tensor, bool, int, ModelOutput, tuple, list, dict, np.ndarray, KerasTensor)
+    allowed_types = (tf.Tensor, bool, int, ModelOutput, tuple, list, dict, np.ndarray, KerasTensor, tf.RaggedTensor)
 
     if "inputs" in kwargs["kwargs_call"]:
         warnings.warn(
@@ -599,11 +595,12 @@ def load_tf_weights(model, resolved_archive_file, ignore_mismatched_sizes=False,
                         delimeter = len(_prefix.split("/"))
                         symbolic_weight_name = "/".join(
                             symbolic_weight.name.split("/")[:delimeter]
-                            + symbolic_weight.name.split("/")[delimeter + 1 :]
+                            + symbolic_weight.name.split("/")[delimeter + 1:]
                         )
                     else:
                         symbolic_weight_name = "/".join(symbolic_weight.name.split("/")[1:])
-
+                    print(list(saved_weights)[:20], symbolic_weight_name, symbolic_weight.name)
+                    raise ValueError
                     # here we check if the current weight is among the weights from the H5 file
                     # If yes, get the weight_value of the corresponding weight from the H5 file
                     # If not, make the value to None
@@ -876,15 +873,15 @@ class TFPreTrainedModel(tf.keras.Model, TFModelUtilsMixin, TFGenerationMixin, Pu
         return {"epoch": extra_data["epoch"]}
 
     def compile(
-        self,
-        optimizer="rmsprop",
-        loss="passthrough",
-        metrics=None,
-        loss_weights=None,
-        weighted_metrics=None,
-        run_eagerly=None,
-        steps_per_execution=None,
-        **kwargs
+            self,
+            optimizer="rmsprop",
+            loss="passthrough",
+            metrics=None,
+            loss_weights=None,
+            weighted_metrics=None,
+            run_eagerly=None,
+            steps_per_execution=None,
+            **kwargs
     ):
         """
         This is a thin wrapper that sets the model's loss output head as the loss if the user does not specify a loss
@@ -913,6 +910,7 @@ class TFPreTrainedModel(tf.keras.Model, TFModelUtilsMixin, TFGenerationMixin, Pu
     def compute_loss(self, *args, **kwargs):
         if hasattr(tf.keras.Model, "compute_loss"):
             # This will be true in TF 2.8 or greater
+            raise ValueError
             return super().compute_loss(*args, **kwargs)
         else:
             warnings.warn(
@@ -949,12 +947,18 @@ class TFPreTrainedModel(tf.keras.Model, TFModelUtilsMixin, TFGenerationMixin, Pu
         elif y is None and "input_ids" in x:
             # Just make any kind of dummy array to make loss work
             y = tf.zeros(tf.shape(x["input_ids"])[0], dtype=tf.int64)
+        y = None
         # Run forward pass.
         with tf.GradientTape() as tape:
             y_pred = self(x, training=True)
+            tf.print("regularization_losses: ", tf.reduce_sum(self.losses))
             loss = self.compiled_loss(y, y_pred, sample_weight, regularization_losses=self.losses)
+            tf.print("pred loss: ", tf.reduce_sum(y_pred["loss"]))
+
+        # raise ValueError
         # Run backwards pass.
         self.optimizer.minimize(loss, self.trainable_variables, tape=tape)
+        # raise ValueError
         # When y_pred is a ModelOutput and y is a tf.Tensor the metrics update
         # should be done only with the relevant ModelOutput param that is
         # considered by the loss.
@@ -1009,17 +1013,17 @@ class TFPreTrainedModel(tf.keras.Model, TFModelUtilsMixin, TFGenerationMixin, Pu
         return return_metrics
 
     def create_model_card(
-        self,
-        output_dir,
-        model_name: str,
-        language: Optional[str] = None,
-        license: Optional[str] = None,
-        tags: Optional[str] = None,
-        finetuned_from: Optional[str] = None,
-        tasks: Optional[str] = None,
-        dataset_tags: Optional[Union[str, List[str]]] = None,
-        dataset: Optional[Union[str, List[str]]] = None,
-        dataset_args: Optional[Union[str, List[str]]] = None,
+            self,
+            output_dir,
+            model_name: str,
+            language: Optional[str] = None,
+            license: Optional[str] = None,
+            tags: Optional[str] = None,
+            finetuned_from: Optional[str] = None,
+            tasks: Optional[str] = None,
+            dataset_tags: Optional[Union[str, List[str]]] = None,
+            dataset: Optional[Union[str, List[str]]] = None,
+            dataset_args: Optional[Union[str, List[str]]] = None,
     ):
         # Avoids a circular import by doing this when necessary.
         from .modelcard import TrainingSummary
@@ -1424,6 +1428,7 @@ class TFPreTrainedModel(tf.keras.Model, TFModelUtilsMixin, TFGenerationMixin, Pu
         # If we have a custom model, we copy the file defining it in the folder and set the attributes so it can be
         # loaded from the Hub.
         if self._auto_class is not None:
+            raise ValueError("custom object???")
             custom_object_save(self, save_directory, config=self.config)
 
         self.config.save_pretrained(save_directory)
@@ -1885,7 +1890,7 @@ class TFSharedEmbeddings(tf.keras.layers.Layer):
         super().__init__(**kwargs)
         self.vocab_size = vocab_size
         self.hidden_size = hidden_size
-        self.initializer_range = hidden_size**-0.5 if initializer_range is None else initializer_range
+        self.initializer_range = hidden_size ** -0.5 if initializer_range is None else initializer_range
 
     def build(self, input_shape):
         """

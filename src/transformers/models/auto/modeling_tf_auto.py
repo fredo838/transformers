@@ -29,6 +29,7 @@ logger = logging.get_logger(__name__)
 TF_MODEL_MAPPING_NAMES = OrderedDict(
     [
         # Base model mapping
+        ("yolo_v3", "TFYoloV3Model"),
         ("speech_to_text", "TFSpeech2TextModel"),
         ("clip", "TFCLIPModel"),
         ("deberta-v2", "TFDebertaV2Model"),
@@ -108,6 +109,7 @@ TF_MODEL_FOR_PRETRAINING_MAPPING_NAMES = OrderedDict(
 TF_MODEL_WITH_LM_HEAD_MAPPING_NAMES = OrderedDict(
     [
         # Model with LM heads mapping
+("yolo_v3", "TFYoloV3ForMaskedLM"),
         ("speech_to_text", "TFSpeech2TextForConditionalGeneration"),
         ("rembert", "TFRemBertForMaskedLM"),
         ("roformer", "TFRoFormerForMaskedLM"),
@@ -143,6 +145,7 @@ TF_MODEL_WITH_LM_HEAD_MAPPING_NAMES = OrderedDict(
 TF_MODEL_FOR_CAUSAL_LM_MAPPING_NAMES = OrderedDict(
     [
         # Model for Causal LM mapping
+("yolo_v3", "TFYoloV3ForCausalLM"),
         ("camembert", "TFCamembertForCausalLM"),
         ("rembert", "TFRemBertForCausalLM"),
         ("roformer", "TFRoFormerForCausalLM"),
@@ -175,6 +178,7 @@ TF_MODEL_FOR_VISION_2_SEQ_MAPPING_NAMES = OrderedDict(
 TF_MODEL_FOR_MASKED_LM_MAPPING_NAMES = OrderedDict(
     [
         # Model for Masked LM mapping
+("yolo_v3", "TFYoloV3ForMaskedLM"),
         ("deberta-v2", "TFDebertaV2ForMaskedLM"),
         ("deberta", "TFDebertaForMaskedLM"),
         ("rembert", "TFRemBertForMaskedLM"),
@@ -223,6 +227,7 @@ TF_MODEL_FOR_SPEECH_SEQ_2_SEQ_MAPPING_NAMES = OrderedDict(
 TF_MODEL_FOR_SEQUENCE_CLASSIFICATION_MAPPING_NAMES = OrderedDict(
     [
         # Model for Sequence Classification mapping
+("yolo_v3", "TFYoloV3ForSequenceClassification"),
         ("deberta-v2", "TFDebertaV2ForSequenceClassification"),
         ("deberta", "TFDebertaForSequenceClassification"),
         ("rembert", "TFRemBertForSequenceClassification"),
@@ -255,6 +260,7 @@ TF_MODEL_FOR_SEQUENCE_CLASSIFICATION_MAPPING_NAMES = OrderedDict(
 TF_MODEL_FOR_QUESTION_ANSWERING_MAPPING_NAMES = OrderedDict(
     [
         # Model for Question Answering mapping
+("yolo_v3", "TFYoloV3ForQuestionAnswering"),
         ("deberta-v2", "TFDebertaV2ForQuestionAnswering"),
         ("deberta", "TFDebertaForQuestionAnswering"),
         ("rembert", "TFRemBertForQuestionAnswering"),
@@ -289,6 +295,7 @@ TF_MODEL_FOR_TABLE_QUESTION_ANSWERING_MAPPING_NAMES = OrderedDict(
 TF_MODEL_FOR_TOKEN_CLASSIFICATION_MAPPING_NAMES = OrderedDict(
     [
         # Model for Token Classification mapping
+("yolo_v3", "TFYoloV3ForTokenClassification"),
         ("deberta-v2", "TFDebertaV2ForTokenClassification"),
         ("deberta", "TFDebertaForTokenClassification"),
         ("rembert", "TFRemBertForTokenClassification"),
@@ -315,6 +322,7 @@ TF_MODEL_FOR_TOKEN_CLASSIFICATION_MAPPING_NAMES = OrderedDict(
 TF_MODEL_FOR_MULTIPLE_CHOICE_MAPPING_NAMES = OrderedDict(
     [
         # Model for Multiple Choice mapping
+("yolo_v3", "TFYoloV3ForMultipleChoice"),
         ("rembert", "TFRemBertForMultipleChoice"),
         ("roformer", "TFRoFormerForMultipleChoice"),
         ("convbert", "TFConvBertForMultipleChoice"),

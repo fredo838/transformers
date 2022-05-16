@@ -117,6 +117,7 @@ _import_structure = {
     ],
     "models": [],
     # Models
+    "models.yolo_v3": ["YOLO_V3_PRETRAINED_CONFIG_ARCHIVE_MAP", "YoloV3Config", "YoloV3Tokenizer"],
     "models.albert": ["ALBERT_PRETRAINED_CONFIG_ARCHIVE_MAP", "AlbertConfig"],
     "models.auto": [
         "ALL_PRETRAINED_CONFIG_ARCHIVE_MAP",
@@ -438,6 +439,7 @@ else:
 # tokenizers-backed objects
 if is_tokenizers_available():
     # Fast tokenizers
+    _import_structure["models.yolo_v3"].append("YoloV3TokenizerFast")
     _import_structure["models.realm"].append("RealmTokenizerFast")
     _import_structure["models.xglm"].append("XGLMTokenizerFast")
     _import_structure["models.fnet"].append("FNetTokenizerFast")
@@ -1720,6 +1722,21 @@ if is_tf_available():
         "shape_list",
     ]
     # TensorFlow models structure
+
+    _import_structure["models.yolo_v3"].extend(
+        [
+            "TF_YOLO_V3_PRETRAINED_MODEL_ARCHIVE_LIST",
+            "TFYoloV3ForMaskedLM",
+            "TFYoloV3ForCausalLM",
+            "TFYoloV3ForMultipleChoice",
+            "TFYoloV3ForQuestionAnswering",
+            "TFYoloV3ForSequenceClassification",
+            "TFYoloV3ForTokenClassification",
+            "TFYoloV3Layer",
+            "TFYoloV3Model",
+            "TFYoloV3PreTrainedModel",
+        ]
+    )
     _import_structure["models.albert"].extend(
         [
             "TF_ALBERT_PRETRAINED_MODEL_ARCHIVE_LIST",
@@ -2497,6 +2514,7 @@ if TYPE_CHECKING:
         load_tf2_weights_in_pytorch_model,
     )
     from .models.albert import ALBERT_PRETRAINED_CONFIG_ARCHIVE_MAP, AlbertConfig
+    from .models.yolo_v3 import YOLO_V3_PRETRAINED_CONFIG_ARCHIVE_MAP, YoloV3Config, YoloV3Tokenizer
     from .models.auto import (
         ALL_PRETRAINED_CONFIG_ARCHIVE_MAP,
         CONFIG_MAPPING,
@@ -2787,6 +2805,7 @@ if TYPE_CHECKING:
         from .utils.dummy_sentencepiece_objects import *
 
     if is_tokenizers_available():
+        from .models.yolo_v3 import YoloV3TokenizerFast
         from .models.albert import AlbertTokenizerFast
         from .models.bart import BartTokenizerFast
         from .models.barthez import BarthezTokenizerFast
@@ -3821,6 +3840,19 @@ if TYPE_CHECKING:
 
     # TensorFlow
     if is_tf_available():
+
+        from .models.yolo_v3 import (
+            TF_YOLO_V3_PRETRAINED_MODEL_ARCHIVE_LIST,
+            TFYoloV3ForMaskedLM,
+            TFYoloV3ForCausalLM,
+            TFYoloV3ForMultipleChoice,
+            TFYoloV3ForQuestionAnswering,
+            TFYoloV3ForSequenceClassification,
+            TFYoloV3ForTokenClassification,
+            TFYoloV3Layer,
+            TFYoloV3Model,
+            TFYoloV3PreTrainedModel,
+        )
 
         from .benchmark.benchmark_args_tf import TensorFlowBenchmarkArguments
 
